@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Wall Go · หมากล้อมกำแพง</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --pink: #ff9eb5;
+      --pink-dark: #ff7a9c;
+      --blue: #7ec8ff;
+      --blue-dark: #5bb0f0;
+      --lavender: #e6d5ff;
+      --text: #5c4a6b;
+      --text-soft: #8a7599;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(160deg, #fff5f8 0%, #f0e8ff 45%, #e8f4ff 100%);
+      min-height: 100vh;
+      color: var(--text);
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .screen {
+      display: none;
+      min-height: 100vh;
+      width: 100%;
+      padding: 20px 16px 40px;
+      animation: fadeIn 0.3s ease;
+    }
+    .screen.active { display: flex; flex-direction: column; align-items: center; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 14px 26px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #ff9eb5, #e88bb8);
+      color: white;
+      box-shadow: 0 8px 22px rgba(255, 158, 181, 0.4);
+    }
+    .btn-primary:active { transform: scale(0.97); }
+    .btn-secondary {
+      background: white;
+      color: var(--text);
+      border: 2px solid #ffd0e0;
+    }
+    .btn-back {
+      background: white;
+      border: 2px solid #e8d0f0;
+      color: #9a7ab0;
+      padding: 9px 18px;
+      font-size: 0.95rem;
+    }
+
+    #landing { justify-content: center; text-align: center; }
+    .badge {
+      background: linear-gradient(135deg, #ff9eb5, #c9a0ff);
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 5px 14px;
+      border-radius: 999px;
+      margin-bottom: 16px;
+    }
+    .title {
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(2.6rem, 9vw, 3.8rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, #ff7a9c, #b57edc, #7ec8ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
+    }
+    .subtitle {
+      color: var(--text-soft);
+      font-weight: 600;
+      margin-bottom: 28px;
+      font-size: 1.05rem;
+    }
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      max-width: 280px;
+      margin-top: 10px;
+    }
+
+    #rules { max-width: 520px; margin: 0 auto; }
+    .page-header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+    .page-header h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #c06b9a;
+    }
+    .rule-card {
+      background: white;
+      border-radius: 18px;
+      padding: 18px 20px;
+      margin-bottom: 12px;
+      box-shadow: 0 6px 18px rgba(180,140,200,0.1);
+      border: 1.5px solid #f5e8ff;
+      position: relative;
+      overflow: hidden;
+    }
+    .rule-card::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 5px;
+      background: linear-gradient(#ff9eb5, #c9a0ff);
+    }
+    .rule-card h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #b06b9a;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tag {
+      background: var(--lavender);
+      color: #7a5a9a;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 9px;
+      border-radius: 999px;
+    }
+    .rule-card ul { padding-left: 18px; margin-top: 4px; }
+    .rule-card li { margin-bottom: 3px; font-size: 0.95rem; line-height: 1.5; }
+
+    #game { padding-bottom: 30px; }
+    .game-top {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .turn-box {
+      background: white;
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      box-shadow: 0 4px 14px rgba(180,140,200,0.15);
+      border: 2px solid #f0e0ff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dot {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+    }
+    .dot.pink { background: linear-gradient(135deg, #ff9eb5, #ff7a9c); }
+    .dot.blue { background: linear-gradient(135deg, #7ec8ff, #5bb0f0); }
+
+    .status {
+      text-align: center;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-soft);
+      margin-bottom: 12px;
+      min-height: 24px;
+    }
+
+    .board-wrap {
+      background: white;
+      border-radius: 22px;
+      padding: 12px;
+      box-shadow: 0 12px 32px rgba(180,140,200,0.18);
+      border: 2px solid #ffe0ec;
+      max-width: 420px;
+      width: 100%;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0;
+      background: #f3ecff;
+      border-radius: 14px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .cell {
+      aspect-ratio: 1;
+      background: linear-gradient(145deg, #ffffff, #f8f3ff);
+      border: 1px solid #efe6f8;
+      position: relative;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+    .cell:active { background: #fff0f5; }
+    .cell.highlight {
+      background: #ffe8f0 !important;
+      box-shadow: inset 0 0 0 2px #ff9eb5;
+    }
+    .cell.valid-move {
+      background: #e8f8ff !important;
+      box-shadow: inset 0 0 0 2px #7ec8ff;
+    }
+
+    .piece {
+      width: 62%;
+      height: 62%;
+      border-radius: 50%;
+      z-index: 2;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+      transition: transform 0.15s;
+    }
+    .piece.pink { background: linear-gradient(145deg, #ffb0c4, #ff7a9c); }
+    .piece.blue { background: linear-gradient(145deg, #9ad4ff, #5bb0f0); }
+    .piece.selected {
+      transform: scale(1.15);
+      box-shadow: 0 0 0 3px #fff, 0 0 0 5px #ff9eb5;
+    }
+
+    .wall-h, .wall-v {
+      position: absolute;
+      background: #c9a0ff;
+      z-index: 3;
+      border-radius: 3px;
+    }
+    .wall-h {
+      height: 5px;
+      left: 8%;
+      right: 8%;
+    }
+    .wall-h.top { top: -3px; }
+    .wall-h.bottom { bottom: -3px; }
+    .wall-v {
+      width: 5px;
+      top: 8%;
+      bottom: 8%;
+    }
+    .wall-v.left { left: -3px; }
+    .wall-v.right { right: -3px; }
+
+    .controls {
+      margin-top: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      max-width: 420px;
+      width: 100%;
+    }
+    .wall-btn {
+      background: white;
+      border: 2px solid #e0d0f0;
+      border-radius: 14px;
+      padding: 10px 14px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #7a5a9a;
+      cursor: pointer;
+      min-width: 70px;
+    }
+    .wall-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .wall-btn.active {
+      background: #f0e8ff;
+      border-color: #c9a0ff;
+      color: #6a4a8a;
+    }
+
+    .msg {
+      margin-top: 14px;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--text-soft);
+      max-width: 360px;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+
+  <section id="landing" class="screen active">
+    <div class="badge">inspired by The Devil's Plan</div>
+    <h1 class="title">Wall Go</h1>
+    <p class="subtitle">หมากล้อมกำแพง · เกมกลยุทธ์พาสเทล</p>
+    <div class="btn-group">
+      <button class="btn btn-primary" onclick="startGame()">🎮 เริ่มเล่นเลย</button>
+      <button class="btn btn-secondary" onclick="showScreen('rules')">📖 ดูกฎการเล่น</button>
+    </div>
+  </section>
+
+  <section id="rules" class="screen">
+    <div class="page-header">
+      <button class="btn btn-back" onclick="showScreen('landing')">← กลับ</button>
+      <h2>กฎการเล่น</h2>
+    </div>
+
+    <div class="rule-card">
+      <h3><span class="tag">1</span> เป้าหมาย</h3>
+      <p>ล้อมพื้นที่ให้ใหญ่ที่สุดด้วยกำแพง ผู้ที่มีพื้นที่มากสุดเมื่อจบเกมเป็นผู้ชนะ</p>
+    </div>
+    <div class="rule-card">
+      <h3><span class="tag">2</span> การตั้งค่า</h3>
+      <ul>
+        <li>กระดาน 7×7</li>
+        <li>คนละ 2 ตัวหมาก (ชมพู vs ฟ้า)</li>
+      </ul>
+    </div>
+    <div class="rule-card">
+      <h3><span class="tag">3</span> วิธีเล่น</h3>
+      <ul>
+        <li>เลือกหมาก → เดิน 1 หรือ 2 ช่อง (ตรงหรือเลี้ยวได้)</li>
+        <li>หลังเดินแล้วต้องวางกำแพง 1 อันที่ขอบของช่องที่หมากอยู่</li>
+      </ul>
+    </div>
+    <div class="rule-card">
+      <h3><span class="tag">4</span> กฎสำคัญ</h3>
+      <ul>
+        <li>ห้ามเดินทับหมากหรือผ่านกำแพง</li>
+        <li>กำแพงวางแล้วถาวร</li>
+      </ul>
+    </div>
+
+    <div style="margin-top:22px; text-align:center;">
+      <button class="btn btn-primary" onclick="startGame()">เข้าใจแล้ว เริ่มเล่น →</button>
+    </div>
+  </section>
+
+  <section id="game" class="screen">
+    <div class="game-top">
+      <button class="btn btn-back" onclick="showScreen('landing')">← เมนู</button>
+      <div class="turn-box" id="turnBox">
+        <div class="dot pink" id="turnDot"></div>
+        <span id="turnText">ตาชมพู</span>
+      </div>
+    </div>
+
+    <div class="status" id="status">วางหมากชมพูตัวที่ 1</div>
+
+    <div class="board-wrap">
+      <div class="board" id="board"></div>
+    </div>
+
+    <div class="controls" id="wallControls" style="display:none;">
+      <button class="wall-btn" data-dir="top" onclick="placeWall('top')">↑ บน</button>
+      <button class="wall-btn" data-dir="bottom" onclick="placeWall('bottom')">↓ ล่าง</button>
+      <button class="wall-btn" data-dir="left" onclick="placeWall('left')">← ซ้าย</button>
+      <button class="wall-btn" data-dir="right" onclick="placeWall('right')">→ ขวา</button>
+    </div>
+
+    <p class="msg" id="msg">แตะช่องว่างเพื่อวางหมาก</p>
+  </section>
+
+<script>
+  const SIZE = 7;
+  let phase = 'setup';
+  let currentPlayer = 'pink';
+  let pieces = { pink: [], blue: [] };
+  let walls = {};
+  let selected = null;
+  let justMoved = null;
+  let setupCount = { pink: 0, blue: 0 };
+
+  const boardEl = document.getElementById('board');
+  const statusEl = document.getElementById('status');
+  const msgEl = document.getElementById('msg');
+  const turnText = document.getElementById('turnText');
+  const turnDot = document.getElementById('turnDot');
+  const wallControls = document.getElementById('wallControls');
+
+  function createBoard() {
+    boardEl.innerHTML = '';
+    for (let r = 0; r < SIZE; r++) {
+      for (let c = 0; c < SIZE; c++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.dataset.r = r;
+        cell.dataset.c = c;
+        cell.onclick = () => onCellClick(r, c);
+        boardEl.appendChild(cell);
+      }
+    }
+  }
+
+  function render() {
+    document.querySelectorAll('.cell').forEach(cell => {
+      cell.innerHTML = '';
+      cell.classList.remove('highlight', 'valid-move');
+    });
+
+    ['pink', 'blue'].forEach(color => {
+      pieces[color].forEach(p => {
+        const cell = getCell(p.r, p.c);
+        if (!cell) return;
+        const div = document.createElement('div');
+        div.className = `piece ${color}`;
+        if (selected && selected.r === p.r && selected.c === p.c) {
+          div.classList.add('selected');
+        }
+        cell.appendChild(div);
+      });
+    });
+
+    Object.keys(walls).forEach(key => {
+      const [r, c, dir] = key.split(',');
+      const cell = getCell(+r, +c);
+      if (!cell) return;
+      const w = document.createElement('div');
+      if (dir === 'top' || dir === 'bottom') {
+        w.className = `wall-h ${dir}`;
+      } else {
+        w.className = `wall-v ${dir}`;
+      }
+      cell.appendChild(w);
+    });
+
+    if (selected && phase === 'play' && !justMoved) {
+      getCell(selected.r, selected.c)?.classList.add('highlight');
+      getValidMoves(selected.r, selected.c).forEach(([nr, nc]) => {
+        getCell(nr, nc)?.classList.add('valid-move');
+      });
+    }
+
+    turnText.textContent = currentPlayer === 'pink' ? 'ตาชมพู' : 'ตาฟ้า';
+    turnDot.className = 'dot ' + currentPlayer;
+  }
+
+  function getCell(r, c) {
+    return boardEl.querySelector(`[data-r="${r}"][data-c="${c}"]`);
+  }
+
+  function startGame() {
+    phase = 'setup';
+    currentPlayer = 'pink';
+    pieces = { pink: [], blue: [] };
+    walls = {};
+    selected = null;
+    justMoved = null;
+    setupCount = { pink: 0, blue: 0 };
+    createBoard();
+    render();
+    updateStatus();
+    wallControls.style.display = 'none';
+    showScreen('game');
+  }
+
+  function updateStatus() {
+    if (phase === 'setup') {
+      statusEl.textContent = `วางหมาก${currentPlayer === 'pink' ? 'ชมพู' : 'ฟ้า'} ตัวที่ ${setupCount[currentPlayer] + 1}`;
+      msgEl.textContent = 'แตะช่องว่างเพื่อวางหมาก';
+    } else if (phase === 'play') {
+      if (justMoved) {
+        statusEl.textContent = 'วางกำแพง';
+        msgEl.textContent = 'เลือกทิศทางกำแพงด้านล่าง';
+        wallControls.style.display = 'flex';
+      } else if (selected) {
+        statusEl.textContent = 'เลือกช่องที่จะเดิน';
+        msgEl.textContent = 'ช่องสีฟ้าอ่อน = เดินได้';
+        wallControls.style.display = 'none';
+      } else {
+        statusEl.textContent = `ตาของ${currentPlayer === 'pink' ? 'ชมพู' : 'ฟ้า'} — เลือกหมาก`;
+        msgEl.textContent = 'แตะหมากของตัวเองเพื่อเลือก';
+        wallControls.style.display = 'none';
+      }
+    }
+  }
+
+  function onCellClick(r, c) {
+    if (phase === 'end') return;
+
+    if (phase === 'setup') {
+      if (isOccupied(r, c)) return;
+      pieces[currentPlayer].push({ r, c });
+      setupCount[currentPlayer]++;
+      if (setupCount.pink === 2 && setupCount.blue === 2) {
+        phase = 'play';
+        currentPlayer = 'pink';
+      } else if (setupCount[currentPlayer] === 2) {
+        currentPlayer = currentPlayer === 'pink' ? 'blue' : 'pink';
+      }
+      render();
+      updateStatus();
+      return;
+    }
+
+    if (phase === 'play') {
+      if (justMoved) return;
+
+      const myPiece = pieces[currentPlayer].find(p => p.r === r && p.c === c);
+      if (myPiece) {
+        selected = { r, c };
+        render();
+        updateStatus();
+        return;
+      }
+
+      if (selected) {
+        const moves = getValidMoves(selected.r, selected.c);
+        if (moves.some(([nr, nc]) => nr === r && nc === c)) {
+          const idx = pieces[currentPlayer].findIndex(p => p.r === selected.r && p.c === selected.c);
+          pieces[currentPlayer][idx] = { r, c };
+          justMoved = { r, c };
+          selected = null;
+          render();
+          updateStatus();
+        }
+      }
+    }
+  }
+
+  function getValidMoves(r, c) {
+    const dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+    const result = [];
+
+    for (const [dr, dc] of dirs) {
+      const nr = r + dr, nc = c + dc;
+      if (canMoveTo(r, c, nr, nc)) result.push([nr, nc]);
+    }
+
+    for (const [dr, dc] of dirs) {
+      const midR = r + dr, midC = c + dc;
+      if (!canMoveTo(r, c, midR, midC)) continue;
+      const nr = r + dr*2, nc = c + dc*2;
+      if (canMoveTo(midR, midC, nr, nc)) result.push([nr, nc]);
+      for (const [dr2, dc2] of dirs) {
+        if (dr2 === dr && dc2 === dc) continue;
+        if (dr2 === -dr && dc2 === -dc) continue;
+        const nr2 = midR + dr2, nc2 = midC + dc2;
+        if (canMoveTo(midR, midC, nr2, nc2)) result.push([nr2, nc2]);
+      }
+    }
+
+    result.push([r, c]);
+
+    const set = new Set(result.map(([a,b]) => `${a},${b}`));
+    return [...set].map(s => s.split(',').map(Number));
+  }
+
+  function canMoveTo(fr, fc, tr, tc) {
+    if (tr < 0 || tr >= SIZE || tc < 0 || tc >= SIZE) return false;
+    if (isOccupied(tr, tc)) return false;
+    if (fr === tr) {
+      const dir = tc > fc ? 'right' : 'left';
+      if (walls[`${fr},${fc},${dir}`]) return false;
+      const opp = dir === 'right' ? 'left' : 'right';
+      if (walls[`${tr},${tc},${opp}`]) return false;
+    } else if (fc === tc) {
+      const dir = tr > fr ? 'bottom' : 'top';
+      if (walls[`${fr},${fc},${dir}`]) return false;
+      const opp = dir === 'bottom' ? 'top' : 'bottom';
+      if (walls[`${tr},${tc},${opp}`]) return false;
+    }
+    return true;
+  }
+
+  function isOccupied(r, c) {
+    return pieces.pink.some(p => p.r === r && p.c === c) ||
+           pieces.blue.some(p => p.r === r && p.c === c);
+  }
+
+  function placeWall(dir) {
+    if (!justMoved) return;
+    const { r, c } = justMoved;
+    const key = `${r},${c},${dir}`;
+
+    if (walls[key]) {
+      msgEl.textContent = 'มีกำแพงอยู่แล้ว เลือกด้านอื่น';
+      return;
+    }
+
+    walls[key] = true;
+
+    const oppMap = { top: 'bottom', bottom: 'top', left: 'right', right: 'left' };
+    let nr = r, nc = c;
+    if (dir === 'top') nr--;
+    if (dir === 'bottom') nr++;
+    if (dir === 'left') nc--;
+    if (dir === 'right') nc++;
+    if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE) {
+      walls[`${nr},${nc},${oppMap[dir]}`] = true;
+    }
+
+    justMoved = null;
+    currentPlayer = currentPlayer === 'pink' ? 'blue' : 'pink';
+    render();
+    updateStatus();
+  }
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  createBoard();
+</script>
+</body>
+</html>
